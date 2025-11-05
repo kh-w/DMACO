@@ -1,4 +1,7 @@
 # Dual Moving Average Crossover Option (DMACO)
+
+<img width="362" height="193" alt="image" src="https://github.com/user-attachments/assets/e0f1f589-7699-4f6c-98ce-2851c908d48f" />
+
 Dual Moving Average Crossover Option: an exotic option with a binary payoff that is triggered when two specified simple moving averages (SMAs) of the underlying asset cross each other. The option pays a fixed amount ($1) if the crossover event occurs in the time horizon, and nothing otherwise. 
 
 # Motivation
@@ -78,7 +81,7 @@ Since the DMACO is a path-dependent exotic option, it is well understood that a 
 
 This procedure captures the **first-touch feature** of the DMACO payoff while accounting for the stochastic behavior of the underlying asset and the memory effects introduced by moving averages.
 
-Below are some DMACO prices for different parameters, assuming the stochastic process of the underlying stock is known:
+Below are some DMACO prices for different parameters, assuming the stochastic process of the underlying stock has known and fixed parameters:
 
 | Desciption     | S0  | r (%) | Volatility (%) | Jump Intensity λ | $μ_j$ | $σ_j$ | Short MA (days) | Long MA (days) | Time Horizon T (days) | DMACO Price |
 |----------------|-----|-------|----------------|------------------|-------|-------|-----------------|----------------|-----------------------|-------------|
