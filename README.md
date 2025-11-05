@@ -93,7 +93,7 @@ In the Base scenario, with a short MA window of 5, long MA window of 18, and a t
 
 <img width="634" height="195" alt="image" src="https://github.com/user-attachments/assets/06b46d34-a935-4ea9-8f83-221bdada0e81" />
 
-<img width="4767" height="4190" alt="greeks_summary" src="https://github.com/user-attachments/assets/39959cc3-ede0-42d1-a630-af68388cd4f0" />
+<img width="4767" height="4190" alt="greeks_summary" src="https://github.com/user-attachments/assets/b012e9ee-0971-4ee7-8374-357398e118db" />
 
 All plots use the x-axis for the time horizon and the y-axis for the option price, with sensitivity shown by curves in different colors. 
 
@@ -107,6 +107,8 @@ All plots use the x-axis for the time horizon and the y-axis for the option pric
 
 **Width of short and long MA**: The last two plots show the sensitivity of the option price to the short and long moving average (MA) windows. The first plot indicates that, because the short MA is more volatile than the long MA, a narrower short MA window (with a fixed long MA) is more likely to cross the long MA. Note that the option price approaches zero when both the short and long MA windows are wide and the time horizon is short—for example, the yellow curve remains near zero at shorter horizons. Similarly, the second plot shows that, with a fixed short MA window, a shorter long MA window is more likely to be reached by the short MA. 
 
+Overall, the plots indicate that DMACO prices tend to be higher for longer time horizons, which makes sense: the more time we allow, the greater the likelihood that the short-term and long-term SMAs will cross. For a DMACO to be attractive and practical, the time horizon should be short—aligning with this project’s goal of protecting against the whipsaw effect in a dual-SMA trading strategy. 
+
 # Supply and demand
 
 The DMACO was primarily designed to provide protection for dual-SMA trading strategies, meeting demand from hedgers. At the same time, it can serve as a trend-following investment vehicle, appealing to traders who seek to capitalize directly on moving average crossovers. The option also functions as a tool for volatility speculation, allowing investors to take long positions if they expect high volatility or short positions if they anticipate low volatility. For the same reason, DMACOs can be used to vega hedge existing portfolios. On the supply side, these options are generally offered by market makers or traded over-the-counter between institutional participants, with transactions occurring only when buyers and sellers are matched.
@@ -115,7 +117,7 @@ The DMACO was primarily designed to provide protection for dual-SMA trading stra
 
 Traditionally, when the parameter space is low-dimensional, a dense grid (i.e., a uniform grid across all parameters) can be used to approximate the implied volatility surface. However, for DMACO, the parameter space is high-dimensional, making the computational cost of a dense grid prohibitively high. To address this, we employ the sparse grid method. In this approach, option prices are precomputed across the multidimensional parameter space using a reduced set of strategically selected grid points, i.e. allocating more points to parameters with higher sensitivity and fewer to those with lower sensitivity. Once this efficient grid is constructed, observed market prices and known parameters can be used to interpolate within the sparse grid to infer the remaining unknown parameter.
 
-# Conclusion and further research
+# Conclusion
 
 The Dual Moving Average Crossover Option (DMACO) provides a clear link between technical trading concepts and quantitative option pricing. By tying the payoff to the occurrence of a crossover between short-term and long-term moving averages, the DMACO converts signal noise in trading strategies into a measurable and tradable risk event. This allows traders to hedge against losses from false crossover signals while also offering a tool for speculation on trend dynamics and volatility.
 
