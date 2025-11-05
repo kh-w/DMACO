@@ -1,5 +1,5 @@
 # Dual Moving Average Crossover Option (DMACO)
-Dual Moving Average Crossover Option: an exotic option with a binary payoff that is triggered when two specified simple moving averages (SMAs) of the underlying asset cross each other. The option pays a fixed amount ($1) if the crossover event occurs in the time horizon, and nothing otherwise.
+Dual Moving Average Crossover Option: an exotic option with a binary payoff that is triggered when two specified simple moving averages (SMAs) of the underlying asset cross each other. The option pays a fixed amount ($1) if the crossover event occurs in the time horizon, and nothing otherwise. 
 
 # Motivation
 Dual-SMA trading systems often suffer from signal noise, where short-term and long-term moving averages generate false or “whipsaw” crossovers shortly after an initial trade signal. These rapid re-crossings can lead to premature trades and short-term losses, undermining the reliability of the strategy. To protect against such false signals, one can introduce a **Dual Moving Average Crossover Option (DMACO)** as a noise hedge. The DMACO is structured with a time horizon of *T* days and pays a fixed amount (e.g., $1) if the short-term and long-term SMAs cross again within that period. In effect, it acts as an insurance payout against noisy reversal signals. By purchasing a DMACO alongside each trade signal, traders can offset a portion of losses caused by false crossovers, thereby smoothing overall strategy performance. This approach monetizes signal noise and transforms what would otherwise be “bad luck” reversals into quantifiable, hedgeable events.
@@ -32,15 +32,15 @@ $\frac{dS_t}{S_{t-}}=(r-\lambda_{\kappa})dt+\sigma dW_t+(J-1)dN_t$
 
 where $r$ is the risk-free interest rate, $W_t$ is the standard Brownian motion, $\sigma$ is the volatility, $N_t$ is a Poisson process with intensity $\lambda$, $J$ is a log-normal with parameters $\mu_J$ and $\sigma_J$ to represent jump size, $\lambda_{\kappa}$ is the expected total movement contributed by jumps (expected jump size times expected number of jumps per year).
 
-The **underlying stochastic process** for the Dual Moving Average Crossover Option (DMACO) is defined as $Y_t = M^{(\text{short})}_t - M^{(\text{long})}_t$, where $M^{(\text{short})}_t$ and $M^{(\text{long})}_t$ represent the short-term and long-term moving _arithmetic_ averages of the asset price, respectively. This process captures the difference between the two moving averages and serves as the key variable determining when crossover events occur.
+The **underlying stochastic process** for the Dual Moving Average Crossover Option (DMACO) is defined as $Y_t = MA^{(\text{m})}_t - MA^{(\text{M})}_t$, where $M^{(\text{m})}_t$ and $M^{(\text{M})}_t$ represent the short-term and long-term moving _arithmetic_ averages of the asset price, respectively. This process captures the difference between the two moving averages and serves as the key variable determining when crossover events occur.
 
 Suppose the short window is 5-day, long window is 30-day:
 
-$M_t^{(5)}=\frac{S_t+S_{t-1}+S_{t-2}+S_{t-3}+S_{t-4}}{5}$
+$MA_t^{(5)}=\frac{S_t+S_{t-1}+S_{t-2}+S_{t-3}+S_{t-4}}{5}$
 
-$M_t^{(30)}=\frac{S_t+S_{t-1}+S_{t-2}+\dots+S_{t-28}+S_{t-29}}{30}$
+$MA_t^{(30)}=\frac{S_t+S_{t-1}+S_{t-2}+\dots+S_{t-28}+S_{t-29}}{30}$
 
-$Y_t = M_t^{(5)} - M_t^{(30)} = \frac{6(S_t + S_{t-1} + S_{t-2} + S_{t-3} + S_{t-4}) - (S_t + S_{t-1} + \dots + S_{t-29})}{30}$
+$Y_t = MA_t^{(5)} - MA_t^{(30)} = \frac{6(S_t + S_{t-1} + S_{t-2} + S_{t-3} + S_{t-4}) - (S_t + S_{t-1} + \dots + S_{t-29})}{30}$
 
 The corresponding SDE (or Stochastic Delay Differential Equation (SDDE) to be precise) of $Y_t$ can be obtained directly using the SDE of $S_t$, which the right-hand-side of the SDDE is tedious to represent here. It does not usually has exact analytical solutions, so numerical simulation is used throughout this project.
 
@@ -50,7 +50,11 @@ The **payoff process** is therefore modeled as $1_{{Y_t = 0 \text{ for some }t\i
 
 # Option pricing method - Monte Carlo Simulation
 
-The Dual Moving Average Crossover Option (DMACO) can be priced using the following Monte Carlo approach:
+Let $V$ be the DMACO price, then it can be written as a function of parameters of the Merton jump-diffusion, the short moving average window ($m$), the long moving average window ($M$) and the time horizon (T):
+
+$V:=\text{DMACO Price}=f(S_0,r,\sigma,\lambda_j,\mu_j,\sigma_j,m,M,T)$
+
+Since the DMACO is a path-dependent exotic option, it is well understood that a closed-form pricing function $f$ rarely exists. A practical approach to price DMACO is the following Monte Carlo approach:
 
 1. **Initialize historical prices**  
    - Generate or provide a single path of historical stock prices to seed the moving averages.  
@@ -87,9 +91,21 @@ In the Base scenario, with a short MA window of 5, long MA window of 18, and a t
 
 # Numerical Greeks
 
+<img width="634" height="195" alt="image" src="https://github.com/user-attachments/assets/06b46d34-a935-4ea9-8f83-221bdada0e81" />
+
 <img width="4767" height="4190" alt="greeks_summary" src="https://github.com/user-attachments/assets/39959cc3-ede0-42d1-a630-af68388cd4f0" />
 
-All plots use the x-axis for the time horizon and the y-axis for the option price, with sensitivity shown by curves in different colors. The upper-left plot Delta shows the overlapping of all curves, indicates that the option price is largely insensitive to the underlying stock price, which is expected since the event depends on the timing of a moving average crossover, not the initial price levels. The Vega plot shows that option prices are generally higher when the volatility of the underlying asset is greater. This is expected, as higher volatility increases the likelihood that the short-term moving average will cross the longer (smoother) moving average, and vice versa. The Rho plot shows that the option price is somewhat sensitive but not strongly to the risk-free interest rate, with most of the sensitivity arising from discounting. The Lambda plot shows that the option price is somewhat sensitive to the jump intensity (average number of jumps per unit time) but not significantly, mainly because the moving average windows are not large enough to contain frequent jumps. The last two plots show the sensitivity of the option price to the short and long moving average (MA) windows. The first plot indicates that, because the short MA is more volatile than the long MA, a narrower short MA window (with a fixed long MA) is more likely to cross the long MA. Similarly, the second plot shows that, with a fixed short MA window, a shorter long MA window is more likely to be reached by the short MA.
+All plots use the x-axis for the time horizon and the y-axis for the option price, with sensitivity shown by curves in different colors. 
+
+**Delta**: The upper-left plot Delta shows the overlapping of all curves, indicates that the option price is largely insensitive to the underlying stock price, which is expected since the event depends on the timing of a moving average crossover, not the initial price levels. 
+
+**Vega**: The Vega plot shows that option prices are generally higher when the volatility of the underlying asset is greater. This is expected, as higher volatility increases the likelihood that the short-term moving average will cross the longer (smoother) moving average, and vice versa. 
+
+**Rho**: The Rho plot shows that the option price is somewhat sensitive but not strongly to the risk-free interest rate, with most of the sensitivity arising from discounting. 
+
+**Lambda**: The Lambda plot shows that the option price is somewhat sensitive to the jump intensity (average number of jumps per unit time) but not significantly, mainly because the moving average windows are not large enough to contain frequent jumps. 
+
+**Width of short and long MA**: The last two plots show the sensitivity of the option price to the short and long moving average (MA) windows. The first plot indicates that, because the short MA is more volatile than the long MA, a narrower short MA window (with a fixed long MA) is more likely to cross the long MA. Note that the option price approaches zero when both the short and long MA windows are wide and the time horizon is short—for example, the yellow curve remains near zero at shorter horizons. Similarly, the second plot shows that, with a fixed short MA window, a shorter long MA window is more likely to be reached by the short MA. 
 
 # Supply and demand
 
